@@ -16,6 +16,7 @@ function drawCircle( number, radius, fillmode )
 end
 
 function drawSecondCircle( seconds )
+	love.graphics.arc( "line", width/2, height/2, (width-5)/2 - 20, -math.pi/2, seconds*math.pi/30 - math.pi/2, 100 )
 end
 
 function drawMinuteCircles( minutes )
@@ -51,7 +52,8 @@ function love.draw()
 	for i=0, 59, 5 do
 		drawCircle( i, (width-5)/2, true )
 	end
-	drawMinuteCircles( currentSecond )
+	drawSecondCircle( currentSecond )
+	drawMinuteCircles( currentMinute )
 end
 
 function love.keypressed( key )
