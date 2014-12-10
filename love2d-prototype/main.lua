@@ -5,23 +5,43 @@ function round( number )
 	return math.floor( number + 0.5 )
 end
 
-function drawCircles( number, radius, fillmode )
+function drawCircle( number, radius, fillmode )
 	local fillstring = "line"
 	if fillmode then
 		fillstring = "fill"
 	end
-	local xCoord = width/2 + radius*math.cos(number*math.pi/30)
-	local yCoord = height/2 + radius*math.sin(number*math.pi/30)
+	local xCoord = width/2 + radius*math.cos(number*math.pi/30 - math.pi/2)
+	local yCoord = height/2 + radius*math.sin(number*math.pi/30 - math.pi/2)
 	love.graphics.circle( fillstring, round(xCoord), round(yCoord), 2.6, 100 )
+end
+
+function drawSecondCircle( seconds )
+end
+
+function drawMinuteCircles( minutes )
+	--draw filled circle for each minute
+	for i=0, minutes do
+		drawCircle( i, (width-5)/2 - 8, true )
+	end
+	
+	--draw empty circles for the remaining hour
+	for i=(minutes+1), 59 do
+		drawCircle( i, (width-5)/2 - 8, false )
+	end
 end
 
 function love.load()
 	--helper variables for timer callbacks
 	--contain the last time the specific callbacks got triggered
-	lastSecond = love.timer.getTime()
-	lastMinute = love.timer.getTime()
-	lastHour = love.timer.getTime();
+	local now = love.timer.getTime()
+	lastSecond = now
+	lastMinute = now
+	lastHour = now
 
+	--current time
+	currentSecond = 0
+	currentMinute = 0
+	currentHour = 0
 
 	height = love.window.getHeight()
 	width = love.window.getWidth()
@@ -29,11 +49,9 @@ end
 
 function love.draw()
 	for i=0, 59, 5 do
-		drawCircles( i, (width-5)/2, true )
+		drawCircle( i, (width-5)/2, true )
 	end
-	for i=0, 59 do
-		drawCircles( i, (width-5)/2 - 8, false )
-	end
+	drawMinuteCircles( currentSecond )
 end
 
 function love.keypressed( key )
@@ -43,15 +61,18 @@ function love.keypressed( key )
 end
 
 function everySecond()
-	print( "second" )
+	currentSecond = ( currentSecond + 1 ) % 60
+	print( currentSecond, " second(s)" )
 end
 
 function everyMinute()
-	print( "minute" )
+	currentMinute = ( currentMinute + 1 ) % 60
+	print( currentMinute, " minute(s)" )
 end
 
 function everyHour()
-	print( "hour" )
+	currentHour = ( currentHour + 1 ) % 12
+	print( currentHour, " hour(s)" )
 end
 
 function love.update( dt )
