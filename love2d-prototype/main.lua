@@ -16,7 +16,14 @@ function drawCircle( number, radius, fillmode )
 end
 
 function drawSecondCircle( seconds )
-	love.graphics.arc( "line", width/2, height/2, (width-5)/2 - 20, -math.pi/2, seconds*math.pi/30 - math.pi/2, 100 )
+	local x = width/2
+	local y = height/2
+	local radius = (width-5)/2 - 20
+	love.graphics.arc( "line", x, y, radius, -math.pi/2, seconds*math.pi/30 - math.pi/2, 100 )
+	helpers.saveColor()
+	love.graphics.setColor( 0, 0, 0 )
+	love.graphics.circle( "fill", x, y, radius - 1, 100 )
+	helpers.resetColor()
 end
 
 function drawMinuteCircles( minutes )
@@ -48,6 +55,7 @@ function love.load()
 	width = love.window.getWidth()
 
 	draw = require "draw"
+	helpers = require "helpers"
 end
 
 function love.draw()
