@@ -18,7 +18,7 @@ end
 function drawSecondCircle( seconds )
 	local x = width/2
 	local y = height/2
-	local radius = (width-5)/2 - 20
+	local radius = (width-5)/2 - 16
 	love.graphics.arc( "line", x, y, radius, -math.pi/2, seconds*math.pi/30 - math.pi/2, 100 )
 	helpers.saveColor()
 	love.graphics.setColor( 0, 0, 0 )
