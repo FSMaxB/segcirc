@@ -54,7 +54,6 @@ function love.load()
 	height = love.window.getHeight()
 	width = love.window.getWidth()
 
-	draw = require "draw"
 	helpers = require "helpers"
 end
 
