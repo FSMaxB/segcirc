@@ -10,31 +10,30 @@ function drawCircle( number, radius, fillmode )
 	if fillmode then
 		fillstring = "fill"
 	end
-	local xCoord = width/2 + radius*math.cos(number*math.pi/30 - math.pi/2)
-	local yCoord = height/2 + radius*math.sin(number*math.pi/30 - math.pi/2)
+	local xCoord = width/2 + radius*math.cos(number*minuteAngle - math.pi/2)
+	local yCoord = height/2 + radius*math.sin(number*minuteAngle - math.pi/2)
 	love.graphics.circle( fillstring, round(xCoord), round(yCoord), 2.6, 100 )
 end
 
-function drawSecondCircle( seconds )
+function drawSecondCircle( seconds, radius )
 	local x = width/2
 	local y = height/2
-	local radius = (width-5)/2 - 16
-	love.graphics.arc( "line", x, y, radius, -math.pi/2, seconds*math.pi/30 - math.pi/2, 100 )
+	love.graphics.arc( "line", x, y, radius, -math.pi/2, seconds*minuteAngle - math.pi/2, 100 )
 	helpers.saveColor()
 	love.graphics.setColor( 0, 0, 0 )
 	love.graphics.circle( "fill", x, y, radius - 1, 100 )
 	helpers.resetColor()
 end
 
-function drawMinuteCircles( minutes )
+function drawMinuteCircles( minutes, radius )
 	--draw filled circle for each minute
 	for i=0, minutes do
-		drawCircle( i, (width-5)/2 - 8, true )
+		drawCircle( i, radius, true )
 	end
 	
 	--draw empty circles for the remaining hour
 	for i=(minutes+1), 59 do
-		drawCircle( i, (width-5)/2 - 8, false )
+		drawCircle( i, radius, false )
 	end
 end
 
@@ -71,15 +70,19 @@ function love.load()
 	height = love.window.getHeight()
 	width = love.window.getWidth()
 
+	--angle of one minute on the clock
+	minuteAngle = math.pi/30
+
 	helpers = require "helpers"
 end
 
 function love.draw()
+	local outerRadius = (width-5)/2
 	for i=0, 59, 5 do
-		drawCircle( i, (width-5)/2, true )
+		drawCircle( i, outerRadius, true )
 	end
-	drawSecondCircle( currentSecond )
-	drawMinuteCircles( currentMinute )
+	drawSecondCircle( currentSecond, (width-5)/2 - 16 )
+	drawMinuteCircles( currentMinute, (width-5)/2 - 8 )
 	drawTimeText( currentHour, currentMinute, currentSecond )
 end
 
