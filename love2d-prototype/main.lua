@@ -70,6 +70,18 @@ function love.keypressed( key )
 	if key == "q" then
 		love.event.quit()
 	end
+
+	if key == "s" then
+		currentSecond = (currentSecond + 1) % 60
+	end
+
+	if key == "m" then
+		currentMinute = (currentMinute + 1) % 60
+	end
+	
+	if key == "h" then
+		currentHour = (currentHour + 1) % 12
+	end
 end
 
 function everySecond()
