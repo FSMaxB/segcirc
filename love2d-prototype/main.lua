@@ -37,6 +37,33 @@ function drawMinuteCircles( minutes, radius )
 	end
 end
 
+function drawHourHand( hours, innerRadius, outerRadius )
+	local leftAngle = minuteAngle*5*hours - minuteAngle/2
+	local rightAngle = minuteAngle*5*hours + minuteAngle/2
+	local innerLeft = {
+		x = width/2 + innerRadius*math.cos( leftAngle ),
+		y = height/2 + innerRadius*math.sin( leftAngle )
+	}
+	local innerRight = {
+		x = width/2 + innerRadius*math.cos( rightAngle ),
+		y = height/2 + innerRadius*math.sin( rightAngle )
+	}
+	local outerLeft = {
+		x = width/2 + outerRadius*math.cos( leftAngle ),
+		y = height/2 + outerRadius*math.sin( leftAngle )
+	}
+	local outerRight = {
+		x = width/2 + outerRadius*math.cos( rightAngle ),
+		y = height/2 + outerRadius*math.sin( rightAngle )
+	}
+
+	love.graphics.point( innerLeft.x, innerLeft.y )
+	love.graphics.point( innerRight.x, innerRight.y )
+	love.graphics.point( outerLeft.x, outerLeft.y )
+	love.graphics.point( outerRight.x, outerRight.y )
+	love.graphics.polygon( "fill", innerLeft.x, innerLeft.y, innerRight.x, innerRight.y, outerRight.x, outerRight.y, outerLeft.x, outerLeft.y ) 
+end
+
 --create two digit string from number
 function getNumString( number )
 	if number < 10 then
@@ -77,12 +104,15 @@ function love.load()
 end
 
 function love.draw()
+	local innerRadius = (width-5)/2 - 18
+	local middleRadius = (width-5)/2 - 8
 	local outerRadius = (width-5)/2
 	for i=0, 59, 5 do
 		drawCircle( i, outerRadius, true )
 	end
-	drawSecondCircle( currentSecond, (width-5)/2 - 16 )
-	drawMinuteCircles( currentMinute, (width-5)/2 - 8 )
+	drawSecondCircle( currentSecond, innerRadius )
+	drawMinuteCircles( currentMinute, middleRadius )
+	drawHourHand( currentHour, middleRadius-5, outerRadius+5 )
 	drawTimeText( currentHour, currentMinute, currentSecond )
 end
 
