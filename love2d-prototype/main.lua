@@ -38,8 +38,8 @@ function drawMinuteCircles( minutes, radius )
 end
 
 function drawHourHand( hours, innerRadius, outerRadius )
-	local leftAngle = minuteAngle*5*hours - minuteAngle/2
-	local rightAngle = minuteAngle*5*hours + minuteAngle/2
+	local leftAngle = minuteAngle*5*hours - minuteAngle/2 - math.pi/2
+	local rightAngle = minuteAngle*5*hours + minuteAngle/2 - math.pi/2
 	local innerLeft = {
 		x = width/2 + innerRadius*math.cos( leftAngle ),
 		y = height/2 + innerRadius*math.sin( leftAngle )
@@ -57,10 +57,6 @@ function drawHourHand( hours, innerRadius, outerRadius )
 		y = height/2 + outerRadius*math.sin( rightAngle )
 	}
 
-	love.graphics.point( innerLeft.x, innerLeft.y )
-	love.graphics.point( innerRight.x, innerRight.y )
-	love.graphics.point( outerLeft.x, outerLeft.y )
-	love.graphics.point( outerRight.x, outerRight.y )
 	love.graphics.polygon( "fill", innerLeft.x, innerLeft.y, innerRight.x, innerRight.y, outerRight.x, outerRight.y, outerLeft.x, outerLeft.y ) 
 end
 
