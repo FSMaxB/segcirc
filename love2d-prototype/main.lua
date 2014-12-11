@@ -38,6 +38,23 @@ function drawMinuteCircles( minutes )
 	end
 end
 
+--create two digit string from number
+function getNumString( number )
+	if number < 10 then
+		return "0" .. tostring(number)
+	end
+	return tostring( number )
+end
+
+function drawTimeText( hours, minutes, seconds )
+	local timeString = getNumString( hours ) .. ":" .. getNumString( minutes )
+	local fontSize = 30
+	helpers.font.setFont( fontSize )
+	local textHeight = helpers.font.getHeight( fontSize )
+	local textWidth = helpers.font.getWidth( timeString, fontSize )
+	love.graphics.print( timeString, width/2 - textWidth/2, height/2 - textHeight/2 )
+end
+
 function love.load()
 	--helper variables for timer callbacks
 	--contain the last time the specific callbacks got triggered
@@ -63,6 +80,7 @@ function love.draw()
 	end
 	drawSecondCircle( currentSecond )
 	drawMinuteCircles( currentMinute )
+	drawTimeText( currentHour, currentMinute, currentSecond )
 end
 
 function love.keypressed( key )
