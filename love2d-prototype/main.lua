@@ -78,17 +78,22 @@ function drawTimeText( hours, minutes, seconds )
 end
 
 function love.load()
+	--current time
+	currentDate = os.date( "*t", os.time() )
+	currentSecond = currentDate.sec
+	currentMinute = currentDate.min 
+	currentHour = currentDate.hour 
+
 	--helper variables for timer callbacks
 	--contain the last time the specific callbacks got triggered
-	local now = love.timer.getTime()
-	lastSecond = now
-	lastMinute = now
-	lastHour = now
+	lastSecond = currentSecond
+	lastMinute = currentMinute
+	lastHour = currentMinute
 
-	--current time
-	currentSecond = 0
-	currentMinute = 0
-	currentHour = 0
+	--offset ( to test clock )
+	secondOffset = 0
+	minuteOffset = 0
+	hourOffset = 0
 
 	height = love.window.getHeight()
 	width = love.window.getWidth()
@@ -118,48 +123,51 @@ function love.keypressed( key )
 	end
 
 	if key == "s" then
-		currentSecond = (currentSecond + 1) % 60
+		secondOffset = (secondOffset + 1) % 60
+		print( "second offset:", secondOffset )
+		everySecond()
 	end
 
 	if key == "m" then
-		currentMinute = (currentMinute + 1) % 60
+		minuteOffset = (minuteOffset + 1) % 60
+		print( "minute offset:", minuteOffset )
+		everyMinute()
 	end
 	
 	if key == "h" then
-		currentHour = (currentHour + 1) % 12
+		hourOffset = (hourOffset + 1) % 12
+		print( "hour offset:", hourOffset )
+		everyHour()
 	end
 end
 
 function everySecond()
-	currentSecond = ( currentSecond + 1 ) % 60
-	print( currentSecond, " second(s)" )
+	currentSecond = ( currentDate.sec + secondOffset ) % 60
 end
 
 function everyMinute()
-	currentMinute = ( currentMinute + 1 ) % 60
-	print( currentMinute, " minute(s)" )
+	currentMinute = ( currentDate.min + minuteOffset ) % 60
 end
 
 function everyHour()
-	currentHour = ( currentHour + 1 ) % 12
-	print( currentHour, " hour(s)" )
+	currentHour = ( currentDate.hour + hourOffset ) % 12
 end
 
 function love.update( dt )
-	local now = love.timer.getTime()
+	currentDate = os.date( "*t", os.time() )
 
-	if (now + 1) >= lastSecond then
+	if not (currentDate.sec == lastSecond) then
 		everySecond()
-		lastSecond = lastSecond + 1
+		lastSecond = currentDate.sec
 	end
 
-	if (now + 60 ) >= lastMinute then
+	if not (currentDate.min == lastMinute) then
 		everyMinute()
-		lastMinute = lastMinute + 60
+		lastMinute = currentDate.min
 	end
 
-	if (now + 3600) >= lastHour then
+	if not (currentDate.hour == lastHour) then
 		everyHour()
-		lastHour = lastHour + 3600
+		lastHour = currentDate.hour
 	end
 end
