@@ -69,6 +69,9 @@ function getNumString( number )
 end
 
 function drawTimeText( hours, minutes, seconds )
+	if hours == 0 then
+		hours = 12
+	end
 	local timeString = getNumString( hours ) .. ":" .. getNumString( minutes )
 	local fontSize = 30
 	helpers.font.setFont( fontSize )
