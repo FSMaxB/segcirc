@@ -92,6 +92,16 @@ function drawDate()
 	love.graphics.print( dateString, width/2 - textWidth/2, yPos )
 end
 
+function drawWeekday()
+	local dayString = weekdays[currentDate.wday]
+	local fontSize = 17
+	helpers.font.setFont( fontSize )
+	local textHeight = helpers.font.getHeight( fontSize )
+	local textWidth = helpers.font.getWidth( dayString, fontSize )
+	local yPos = height/2 - helpers.font.getHeight(30)/2 - textHeight - 3
+	love.graphics.print( dayString, width/2 - textWidth/2, yPos )
+end
+
 function love.load()
 	--current time
 	currentDate = os.date( "*t", os.time() )
@@ -113,6 +123,16 @@ function love.load()
 	height = love.window.getHeight()
 	width = love.window.getWidth()
 
+	weekdays = {
+		[1] = "So",
+		[2] = "Mo",
+		[3] = "Di",
+		[4] = "Mi",
+		[5] = "Do",
+		[6] = "Fr",
+		[7] = "Sa"
+	}
+
 	--angle of one minute on the clock
 	minuteAngle = math.pi/30
 
@@ -131,6 +151,7 @@ function love.draw()
 	drawHourHand( currentHour, middleRadius-5, outerRadius+5 )
 	drawTimeText( )
 	drawDate()
+	drawWeekday()
 end
 
 function love.keypressed( key )
