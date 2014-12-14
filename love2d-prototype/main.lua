@@ -68,16 +68,28 @@ function getNumString( number )
 	return tostring( number )
 end
 
-function drawTimeText( hours, minutes, seconds )
+function drawTimeText( )
 	if hours == 0 then
 		hours = 12
 	end
-	local timeString = getNumString( hours ) .. ":" .. getNumString( minutes )
+	local timeString = getNumString( currentDate.hour ) .. ":" .. getNumString( currentDate.min )
 	local fontSize = 30
 	helpers.font.setFont( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( timeString, fontSize )
 	love.graphics.print( timeString, width/2 - textWidth/2, height/2 - textHeight/2 )
+end
+
+function drawDate()
+	local dateString = getNumString( currentDate.day ) .. "."
+		.. getNumString( currentDate.month ) .. "."
+		.. tostring(currentDate.year)
+	local fontSize = 12
+	helpers.font.setFont( fontSize )
+	local textHeight = helpers.font.getHeight( fontSize )
+	local textWidth = helpers.font.getWidth( dateString, fontSize )
+	local yPos = height/2 + helpers.font.getHeight(30)/2 
+	love.graphics.print( dateString, width/2 - textWidth/2, yPos )
 end
 
 function love.load()
@@ -117,7 +129,8 @@ function love.draw()
 	drawSecondCircle( currentSecond, innerRadius )
 	drawMinuteCircles( currentMinute, middleRadius )
 	drawHourHand( currentHour, middleRadius-5, outerRadius+5 )
-	drawTimeText( currentHour, currentMinute, currentSecond )
+	drawTimeText( )
+	drawDate()
 end
 
 function love.keypressed( key )
