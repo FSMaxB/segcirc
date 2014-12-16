@@ -95,7 +95,7 @@ end
 
 function drawWeekday()
 	local dayString = weekdays[(currentDate.wday + dayOffset) % 7 + 1]
-	local fontSize = 20
+	local fontSize = 22
 	helpers.font.setFontSize( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( dayString, fontSize )
@@ -136,13 +136,13 @@ function love.load()
 	timeTextWidth = 0
 
 	weekdays = {
-		[1] = "SO",
-		[2] = "MO",
-		[3] = "DI",
-		[4] = "MI",
-		[5] = "DO",
-		[6] = "FR",
-		[7] = "SA"
+		[1] = "So",
+		[2] = "Mo",
+		[3] = "Di",
+		[4] = "Mi",
+		[5] = "Do",
+		[6] = "Fr",
+		[7] = "Sa"
 	}
 
 	--angle of one minute on the clock
