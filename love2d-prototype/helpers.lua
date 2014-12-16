@@ -5,29 +5,50 @@ helpers.color = {}
 --table to save all fonts in
 helpers.font = {
 	setFont =
+		function( filename )
+			helpers.font.filename = filename
+			for index, value in pairs(helpers.font.fontTable) do
+				helpers.font.fontTable[index] = love.graphics.newFont( filename, index )
+			end
+			print( filename )
+		end,
+	setFontSize =
 		function( size )
-			if helpers.font[size] == nil then
-				helpers.font[size] = love.graphics.newFont( size )
+			if helpers.font.fontTable[size] == nil then
+				if helpers.font.filename == nil then
+					helpers.font.fontTable[size] = love.graphics.newFont( size )
+				else
+					helpers.font.fontTable[size] = love.graphics.newFont( helpers.font.filename, size )
+				end
 			end
 
-			love.graphics.setFont( helpers.font[size] )
+			love.graphics.setFont( helpers.font.fontTable[size] )
 		end,
 	getWidth =
 		function( text, size )
-			if helpers.font[size] == nil then
-				helpers.font[size] = love.graphics.newFont( size )
+			if helpers.font.fontTable[size] == nil then
+				if helpers.font.filename == nil then
+					helpser.font.fontTable[size] = love.graphics.newFont( size )
+				else
+					helpers.font.fontTable[size] = love.graphics.newFont( helpers.font.filename, size )
+				end
 			end
 
-			return helpers.font[size]:getWidth( text )
+			return helpers.font.fontTable[size]:getWidth( text )
 		end,
 	getHeight =
 		function( size )
-			if helpers.font[size] == nil then
-				helpers.font[size] = love.graphics.newFont( size )
+			if helpers.font.fontTable[size] == nil then
+				if helpers.font.filename == nil then
+					helpers.font.fontTable[size] = love.graphics.newFont( size )
+				else
+					helpers.font.fontTable[size] = love.graphics.newFont( helpers.font.filename, size )
+				end
 			end
 
-			return helpers.font[size]:getHeight()
-		end
+			return helpers.font.fontTable[size]:getHeight()
+		end,
+	fontTable = {}
 }
 
 

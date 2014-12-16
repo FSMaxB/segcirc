@@ -73,38 +73,38 @@ function drawTimeText( )
 		hours = 12
 	end
 	local timeString = getNumString( currentDate.hour ) .. ":" .. getNumString( currentDate.min )
-	local fontSize = 30
-	helpers.font.setFont( fontSize )
+	local fontSize = 34
+	helpers.font.setFontSize( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( timeString, fontSize )
 	timeTextWidth = textWidth
-	love.graphics.print( timeString, width/2 - textWidth/2, height/2 - textHeight/2 )
+	love.graphics.print( timeString, width/2 - textWidth/2, height/2 - textHeight/2 + 5)
 end
 
 function drawDate()
 	local dateString = getNumString( currentDate.day ) .. "."
 		.. getNumString( currentDate.month ) .. "."
 		.. tostring(currentDate.year)
-	local fontSize = 12
-	helpers.font.setFont( fontSize )
+	local fontSize = 14
+	helpers.font.setFontSize( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( dateString, fontSize )
-	local yPos = height/2 + helpers.font.getHeight(30)/2 
+	local yPos = height/2 + helpers.font.getHeight(30)/2  + 5
 	love.graphics.print( dateString, width/2 - textWidth/2, yPos )
 end
 
 function drawWeekday()
 	local dayString = weekdays[currentDate.wday]
-	local fontSize = 17
-	helpers.font.setFont( fontSize )
+	local fontSize = 20
+	helpers.font.setFontSize( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( dayString, fontSize )
-	local yPos = height/2 - helpers.font.getHeight(30)/2 - textHeight - 3
+	local yPos = height/2 - helpers.font.getHeight(30)/2 - textHeight - 7
 	love.graphics.print( dayString, width/2 - textWidth/2, yPos )
 end
 
 function drawBatteryIndicator()
-	local yPos = height/2 - helpers.font.getHeight(30)/2 - 2
+	local yPos = height/2 - helpers.font.getHeight(30)/2 - 6
 	local xPos = width/2 - timeTextWidth/2
 	love.graphics.rectangle( "line", xPos, yPos, timeTextWidth, 3 )
 	love.graphics.rectangle( "fill", xPos, yPos, timeTextWidth*batteryCharge, 3 )
@@ -135,19 +135,21 @@ function love.load()
 	timeTextWidth = 0
 
 	weekdays = {
-		[1] = "So",
-		[2] = "Mo",
-		[3] = "Di",
-		[4] = "Mi",
-		[5] = "Do",
-		[6] = "Fr",
-		[7] = "Sa"
+		[1] = "SO",
+		[2] = "MO",
+		[3] = "DI",
+		[4] = "MI",
+		[5] = "DO",
+		[6] = "FR",
+		[7] = "SA"
 	}
 
 	--angle of one minute on the clock
 	minuteAngle = math.pi/30
 
 	helpers = require "helpers"
+
+	helpers.font.setFont( "FourteenSegment.ttf" )
 end
 
 function love.draw()
