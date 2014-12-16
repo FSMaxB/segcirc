@@ -104,10 +104,11 @@ function drawWeekday()
 end
 
 function drawBatteryIndicator()
+	local barWidth = timeTextWidth*0.9
 	local yPos = height/2 - helpers.font.getHeight(30)/2 - 6
-	local xPos = width/2 - timeTextWidth/2
-	love.graphics.rectangle( "line", xPos, yPos, timeTextWidth, 3 )
-	love.graphics.rectangle( "fill", xPos, yPos, timeTextWidth*batteryCharge, 3 )
+	local xPos = width/2 - barWidth/2
+	love.graphics.rectangle( "line", xPos, yPos, barWidth, 3 )
+	love.graphics.rectangle( "fill", xPos, yPos, barWidth*batteryCharge, 3 )
 end
 
 function love.load()
