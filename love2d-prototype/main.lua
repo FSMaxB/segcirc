@@ -94,7 +94,7 @@ function drawDate()
 end
 
 function drawWeekday()
-	local dayString = weekdays[currentDate.wday]
+	local dayString = weekdays[(currentDate.wday + dayOffset) % 7 + 1]
 	local fontSize = 20
 	helpers.font.setFontSize( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
@@ -127,6 +127,7 @@ function love.load()
 	secondOffset = 0
 	minuteOffset = 0
 	hourOffset = 0
+	dayOffset = 0
 
 	height = love.window.getHeight()
 	width = love.window.getWidth()
@@ -194,6 +195,11 @@ function love.keypressed( key )
 	if key == "b" then
 		batteryCharge = (batteryCharge + 0.1) % 1
 		print( "battery charge:", batteryCharge )
+	end
+
+	if key == "d" then
+		dayOffset = (dayOffset + 1) % 7
+		print( "day offset:", dayOffset )
 	end
 end
 
