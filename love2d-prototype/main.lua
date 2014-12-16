@@ -77,6 +77,7 @@ function drawTimeText( )
 	helpers.font.setFont( fontSize )
 	local textHeight = helpers.font.getHeight( fontSize )
 	local textWidth = helpers.font.getWidth( timeString, fontSize )
+	timeTextWidth = textWidth
 	love.graphics.print( timeString, width/2 - textWidth/2, height/2 - textHeight/2 )
 end
 
@@ -102,6 +103,13 @@ function drawWeekday()
 	love.graphics.print( dayString, width/2 - textWidth/2, yPos )
 end
 
+function drawBatteryIndicator()
+	local yPos = height/2 - helpers.font.getHeight(30)/2 - 2
+	local xPos = width/2 - timeTextWidth/2
+	love.graphics.rectangle( "line", xPos, yPos, timeTextWidth, 3 )
+	love.graphics.rectangle( "fill", xPos, yPos, timeTextWidth*batteryCharge, 3 )
+end
+
 function love.load()
 	--current time
 	currentDate = os.date( "*t", os.time() )
@@ -122,6 +130,9 @@ function love.load()
 
 	height = love.window.getHeight()
 	width = love.window.getWidth()
+
+	batteryCharge = 0.8
+	timeTextWidth = 0
 
 	weekdays = {
 		[1] = "So",
@@ -152,6 +163,7 @@ function love.draw()
 	drawTimeText( )
 	drawDate()
 	drawWeekday()
+	drawBatteryIndicator()
 end
 
 function love.keypressed( key )
@@ -175,6 +187,11 @@ function love.keypressed( key )
 		hourOffset = (hourOffset + 1) % 12
 		print( "hour offset:", hourOffset )
 		everyHour()
+	end
+
+	if key == "b" then
+		batteryCharge = (batteryCharge + 0.1) % 1
+		print( "battery charge:", batteryCharge )
 	end
 end
 
