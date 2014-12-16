@@ -111,6 +111,14 @@ function drawBatteryIndicator()
 	love.graphics.rectangle( "fill", xPos, yPos, barWidth*batteryCharge, 3 )
 end
 
+function drawConnectionSymbol()
+	local imageWidth = noConnectionImage:getWidth()
+	local imageHeight = noConnectionImage:getHeight()
+	if not bluetoothEnabled then
+		love.graphics.draw( noConnectionImage, width/2 - imageWidth/2, 0.73*height - 1 )
+	end
+end
+
 function love.load()
 	--current time
 	currentDate = os.date( "*t", os.time() )
@@ -152,6 +160,8 @@ function love.load()
 	helpers = require "helpers"
 
 	helpers.font.setFont( "FourteenSegment.ttf" )
+	noConnectionImage = love.graphics.newImage("NoConnection.png")
+	bluetoothEnabled = false
 end
 
 function love.draw()
@@ -168,6 +178,7 @@ function love.draw()
 	drawDate()
 	drawWeekday()
 	drawBatteryIndicator()
+	drawConnectionSymbol()
 end
 
 function love.keypressed( key )
@@ -201,6 +212,10 @@ function love.keypressed( key )
 	if key == "d" then
 		dayOffset = (dayOffset + 1) % 7
 		print( "day offset:", dayOffset )
+	end
+
+	if key == "c" then
+		bluetoothEnabled = not bluetoothEnabled 
 	end
 end
 
