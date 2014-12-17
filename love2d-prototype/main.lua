@@ -171,7 +171,7 @@ function love.load()
 end
 
 function love.draw()
-	local innerRadius = (width-5)/2 - 14
+	local innerRadius = (width-5)/2 - 15
 	local middleRadius = (width-5)/2 - 8
 	local outerRadius = (width-5)/2
 	for i=0, 59, 5 do
