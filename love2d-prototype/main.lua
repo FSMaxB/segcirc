@@ -12,7 +12,11 @@ function drawCircle( number, radius, fillmode )
 	end
 	local xCoord = width/2 + radius*math.cos(number*minuteAngle - math.pi/2)
 	local yCoord = height/2 + radius*math.sin(number*minuteAngle - math.pi/2)
-	love.graphics.circle( fillstring, round(xCoord), round(yCoord), 2.6, 100 )
+	if fillstring == "line" then
+		love.graphics.draw( emptyCircleImage, round(xCoord - 2.5), round(yCoord - 2.5) )
+	else
+		love.graphics.draw( fullCircleImage, round(xCoord - 2.5), round(yCoord - 2.5) )
+	end
 end
 
 function drawSecondCircle( seconds, radius )
@@ -161,6 +165,8 @@ function love.load()
 
 	helpers.font.setFont( "FourteenSegment.ttf" )
 	noConnectionImage = love.graphics.newImage("NoConnection.png")
+	fullCircleImage = love.graphics.newImage("fullCircle.png")
+	emptyCircleImage = love.graphics.newImage("emptyCircle.png")
 	bluetoothEnabled = false
 end
 
