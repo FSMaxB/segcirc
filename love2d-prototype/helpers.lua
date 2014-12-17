@@ -10,7 +10,6 @@ helpers.font = {
 			for index, value in pairs(helpers.font.fontTable) do
 				helpers.font.fontTable[index] = love.graphics.newFont( filename, index )
 			end
-			print( filename )
 		end,
 	setFontSize =
 		function( size )

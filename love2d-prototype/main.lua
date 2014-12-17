@@ -13,9 +13,9 @@ function drawCircle( number, radius, fillmode )
 	local xCoord = width/2 + radius*math.cos(number*minuteAngle - math.pi/2)
 	local yCoord = height/2 + radius*math.sin(number*minuteAngle - math.pi/2)
 	if fillstring == "line" then
-		love.graphics.draw( emptyCircleImage, round(xCoord - 2.5), round(yCoord - 2.5) )
+		love.graphics.draw( littleCircleImage, round(xCoord - 1), round(yCoord - 1) )
 	else
-		love.graphics.draw( fullCircleImage, round(xCoord - 2.5), round(yCoord - 2.5) )
+		love.graphics.draw( bigCircleImage, round(xCoord - 2.5), round(yCoord - 2.5) )
 	end
 end
 
@@ -165,13 +165,13 @@ function love.load()
 
 	helpers.font.setFont( "FourteenSegment.ttf" )
 	noConnectionImage = love.graphics.newImage("NoConnection.png")
-	fullCircleImage = love.graphics.newImage("fullCircle.png")
-	emptyCircleImage = love.graphics.newImage("emptyCircle.png")
+	bigCircleImage = love.graphics.newImage("bigCircle.png")
+	littleCircleImage = love.graphics.newImage("littleCircle.png")
 	bluetoothEnabled = false
 end
 
 function love.draw()
-	local innerRadius = (width-5)/2 - 18
+	local innerRadius = (width-5)/2 - 14
 	local middleRadius = (width-5)/2 - 8
 	local outerRadius = (width-5)/2
 	for i=0, 59, 5 do
@@ -179,7 +179,7 @@ function love.draw()
 	end
 	drawSecondCircle( currentSecond, innerRadius )
 	drawMinuteCircles( currentMinute, middleRadius )
-	drawHourHand( currentHour, middleRadius-5, outerRadius+5 )
+	drawHourHand( currentHour, middleRadius-4, outerRadius+4 )
 	drawTimeText( )
 	drawDate()
 	drawWeekday()
