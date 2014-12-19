@@ -1,6 +1,8 @@
 #include "pebble.h"
 
-//global variables
+#define DATE_FORMAT "%d.%m.%Y"
+
+//ui elements
 static Window* window;
 static TextLayer *time_layer;	//to show the time
 static TextLayer *date_layer;	//to show the date
@@ -18,7 +20,9 @@ static BitmapLayer* no_connection_layer;
 //text buffers
 static char time_text[] = "00:00";
 static char date_text[] = "01.01.2014";
-static char wday_text[] = "Thu";
+
+//weekday strings beginning with sunday ( see tm struct tm_wday )
+const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
 
 //global state
 struct state {
@@ -43,12 +47,11 @@ static void handle_minute_tick(struct tm* tick_time, TimeUnits units_changed) {
 
 static void handle_hour_tick(struct tm* tick_time, TimeUnits units_changed) {
 	//set current date string
-	strftime(date_text, sizeof(date_text), "%x", tick_time);
+	strftime(date_text, sizeof(date_text), DATE_FORMAT, tick_time);
 	text_layer_set_text(date_layer, date_text);
 
 	//set current weekday string
-	strftime(wday_text, sizeof(wday_text), "%a", tick_time);
-	text_layer_set_text(wday_layer, wday_text);
+	text_layer_set_text(wday_layer, weekday_strings[tick_time->tm_wday]);
 }
 
 static void init() {
