@@ -1,0 +1,36 @@
+{
+  "uuid": "a10b2b9e-4120-4a93-9e88-1bc3429cd903",
+  "shortName": "segcirc",
+  "longName": "segcirc",
+  "companyName": "FSMaxB",
+  "versionCode": 1,
+  "versionLabel": "0.9",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {},
+  "resources": {
+    "media": [
+		{
+			"type": "font",
+			"name": "FONT_FOURTEEN_SEGMENT_34",
+			"file": "FourteenSegment.ttf"
+		},
+		{
+			"type": "font",
+			"name": "FONT_FOURTEEN_SEGMENT_22",
+			"file": "FourteenSegment.ttf"
+		},
+		{
+			"type": "font",
+			"name": "FONT_FOURTEEN_SEGMENT_14",
+			"file": "FourteenSegment.ttf"
+		},
+		{
+			"type": "png",
+			"name": "IMAGE_NO_CONNECTION",
+			"file": "NoConnection.png"
+		}
+	]
+  }
+}
