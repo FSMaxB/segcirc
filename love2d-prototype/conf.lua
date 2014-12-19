@@ -3,7 +3,7 @@ function love.conf( t )
 
 	t.window.title = "pebble watchface"  -- The window title (string)
 	t.window.width = 144               -- The window width (number)
-	t.window.height = 160              -- The window height (number)
+	t.window.height = 168              -- The window height (number)
 	t.window.borderless = false        -- Remove all border visuals from the window (boolean)
 	t.window.resizable = false          -- Let the window be user-resizable (boolean)
 
