@@ -244,8 +244,8 @@ static void init() {
 	//set hour hand points
 	GPoint point_a = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, -TRIG_MAX_ANGLE / 120);
 	GPoint point_b = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, TRIG_MAX_ANGLE / 120);
-	GPoint point_c = get_point_at_exact_angle(GPoint(0,0), middle_radius - 3, TRIG_MAX_ANGLE / 120);
-	GPoint point_d = get_point_at_exact_angle(GPoint(0,0), middle_radius - 3, -TRIG_MAX_ANGLE / 120);
+	GPoint point_c = get_point_at_exact_angle(GPoint(0,0), middle_radius - 4, TRIG_MAX_ANGLE / 120);
+	GPoint point_d = get_point_at_exact_angle(GPoint(0,0), middle_radius - 4, -TRIG_MAX_ANGLE / 120);
 	hour_hand_points.num_points = 4;
 	hour_hand_points.points = ( GPoint [] ) {
 		{ point_a.x, point_a.y },
