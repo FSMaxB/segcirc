@@ -173,8 +173,8 @@ static void init() {
 	window_bounds = layer_get_bounds(window_layer);
 
 	//create fonts
-	time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_34));
-	wday_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_22));
+	time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_38));
+	wday_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_24));
 	date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_14));
 
 	//init layer
@@ -185,8 +185,9 @@ static void init() {
 	square_bounds = layer_get_bounds(square_layer);
 
 	//init text layers
-	time_bounds = GRect(0, 0, 98, 34);
+	time_bounds = GRect(0, 0, 120, 38);
 	grect_align( &time_bounds, &square_bounds, GAlignCenter, true );
+	time_bounds.origin.y -= 5;
 	time_layer = text_layer_create(time_bounds);
 	text_layer_set_text_color(time_layer, GColorWhite);
 	text_layer_set_background_color(time_layer, GColorClear);
@@ -196,14 +197,14 @@ static void init() {
 	date_bounds = GRect(0, 0, 80, 14);
 	date_bounds.origin = time_bounds.origin;
 	helper_grect_center_x( &date_bounds, &square_bounds );
-	date_bounds.origin.y += time_bounds.size.h + 2;
+	date_bounds.origin.y += time_bounds.size.h;
 	date_layer = text_layer_create(date_bounds);
 	text_layer_set_text_color(date_layer, GColorWhite);
 	text_layer_set_background_color(date_layer, GColorClear);
 	text_layer_set_font(date_layer, date_font);
 	text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
 
-	wday_bounds = GRect(0, 0, 30, 22);
+	wday_bounds = GRect(0, 0, 30, 24);
 	wday_bounds.origin = time_bounds.origin;
 	helper_grect_center_x( &wday_bounds, &square_bounds );
 	wday_bounds.origin.y -= wday_bounds.size.h;

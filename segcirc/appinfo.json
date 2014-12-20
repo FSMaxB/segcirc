@@ -13,12 +13,12 @@
     "media": [
 		{
 			"type": "font",
-			"name": "FONT_FOURTEEN_SEGMENT_34",
+			"name": "FONT_FOURTEEN_SEGMENT_38",
 			"file": "FourteenSegment.ttf"
 		},
 		{
 			"type": "font",
-			"name": "FONT_FOURTEEN_SEGMENT_22",
+			"name": "FONT_FOURTEEN_SEGMENT_24",
 			"file": "FourteenSegment.ttf"
 		},
 		{
