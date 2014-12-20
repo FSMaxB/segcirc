@@ -49,11 +49,14 @@ static struct state state;
 
 //helper functions for drawing
 //get the coordinates of a point on a circle with a certain radius and at a certain angle
-GPoint get_point_at_angle(GPoint middle, uint32_t radius, int16_t angle /*0-59*/) {
-	uint32_t full_angle = TRIG_MAX_ANGLE * angle / 60;
-	middle.x += (sin_lookup(full_angle)*radius / TRIG_MAX_RATIO);
-	middle.y += (-cos_lookup(full_angle)*radius / TRIG_MAX_RATIO);
+static GPoint get_point_at_exact_angle( GPoint middle, uint32_t radius, int16_t angle /*0-TRIG_MAX_ANGLE*/) {
+	middle.x += (sin_lookup(angle)*radius / TRIG_MAX_RATIO);
+	middle.y += (-cos_lookup(angle)*radius / TRIG_MAX_RATIO);
 	return middle;
+}
+
+static GPoint get_point_at_angle(GPoint middle, uint32_t radius, int16_t angle /*0-59*/) {
+	return get_point_at_exact_angle( middle, radius, TRIG_MAX_ANGLE * angle / 60 );
 }
 
 static void helper_grect_center_x( GRect* rect, GRect* outer_rect ) {
@@ -93,8 +96,6 @@ static void draw_minute_circles( GContext* context ) {
 }
 
 static void draw(Layer* layer, GContext* context) {
-	GRect bounds = layer_get_bounds(layer);
-
 	graphics_context_set_stroke_color( context, GColorWhite);
 	graphics_context_set_fill_color( context, GColorWhite );
 
