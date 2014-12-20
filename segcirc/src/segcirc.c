@@ -1,9 +1,14 @@
 #include "pebble.h"
 
 #define DATE_FORMAT "%d.%m.%Y"
+#define HOUR_RADIUS
+#define MINUTE_RADIUS
+#define SECOND_RADIUS
 
 //ui elements
 static Window* window;
+static Layer* window_layer;
+static Layer* square_layer;
 static TextLayer *time_layer;	//to show the time
 static TextLayer *date_layer;	//to show the date
 static TextLayer *wday_layer;	//to show the current weekday
@@ -21,6 +26,14 @@ static BitmapLayer* no_connection_layer;
 static char time_text[] = "00:00";
 static char date_text[] = "01.01.2014";
 
+//bounding rects
+static GRect window_bounds;
+static GRect square_bounds;
+static GRect time_bounds;
+static GRect date_bounds;
+static GRect wday_bounds;
+static GRect no_connection_bounds;
+
 //weekday strings beginning with sunday ( see tm struct tm_wday )
 const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
 
@@ -29,6 +42,36 @@ struct state {
 	bool connected;
 };
 static struct state state;
+
+//helper functions for drawing
+//get the coordinates of a point on a circle with a certain radius and at a certain angle
+GPoint get_point_at_angle(GPoint middle, uint32_t radius, int16_t angle /*0-59*/) {
+	uint32_t full_angle = TRIG_MAX_ANGLE * angle / 60;
+	middle.x += (-cos_lookup(full_angle)*radius / TRIG_MAX_RATIO);
+	middle.y += (sin_lookup(full_angle)*radius / TRIG_MAX_RATIO);
+	return middle;
+}
+
+static void helper_grect_center_x( GRect* rect, GRect* outer_rect ) {
+	int16_t y = rect->origin.y;
+	grect_align( rect, outer_rect, GAlignCenter, true );
+	rect->origin.y = y;
+}
+
+static void helper_grect_center_y( GRect* rect, GRect* outer_rect ) {
+	int16_t x = rect->origin.x;
+	grect_align( rect, outer_rect, GAlignCenter, true );
+	rect->origin.x = x;
+}
+
+//do all the drawing
+static void draw(Layer* layer, GContext* context) {
+	GRect bounds = layer_get_bounds(layer);
+
+	graphics_context_set_stroke_color( context, GColorWhite);
+	graphics_context_set_fill_color( context, GColorWhite );
+	graphics_draw_rect( context, bounds );
+}
 
 //tick handlers
 static void handle_second_tick(struct tm* tick_time) {
@@ -76,43 +119,68 @@ static void init() {
 	window = window_create();
 	window_stack_push(window, true);
 	window_set_background_color(window, GColorBlack);
+	window_layer = window_get_root_layer(window);
+
+	window_bounds = layer_get_bounds(window_layer);
 
 	//create fonts
 	time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_34));
 	wday_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_22));
 	date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_14));
 
-	//init bitmaps
-	image_no_connection = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_NO_CONNECTION);
-	no_connection_layer = bitmap_layer_create(GRect(55, 120, 34, 12));
-	bitmap_layer_set_bitmap(no_connection_layer, image_no_connection);
-	bitmap_layer_set_alignment(no_connection_layer, GAlignCenter);
+	//init layer
+	square_bounds = GRect(0, 0, window_bounds.size.w, window_bounds.size.w );
+	grect_align( &square_bounds, &window_bounds, GAlignCenter, true );
+	square_layer = layer_create(square_bounds);
+	layer_set_update_proc(square_layer, draw);
+	square_bounds = layer_get_bounds(square_layer);
 
 	//init text layers
-	time_layer = text_layer_create(GRect(24, 68, 100, 34));
+	time_bounds = GRect(0, 0, 98, 34);
+	grect_align( &time_bounds, &square_bounds, GAlignCenter, true );
+	time_layer = text_layer_create(time_bounds);
 	text_layer_set_text_color(time_layer, GColorWhite);
 	text_layer_set_background_color(time_layer, GColorClear);
 	text_layer_set_font(time_layer, time_font);
 	text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
 
-	date_layer = text_layer_create(GRect(38, 104, 70, 14));
+	date_bounds = GRect(0, 0, 80, 14);
+	date_bounds.origin = time_bounds.origin;
+	helper_grect_center_x( &date_bounds, &square_bounds );
+	date_bounds.origin.y += time_bounds.size.h + 2;
+	date_layer = text_layer_create(date_bounds);
 	text_layer_set_text_color(date_layer, GColorWhite);
 	text_layer_set_background_color(date_layer, GColorClear);
 	text_layer_set_font(date_layer, date_font);
 	text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
 
-	wday_layer = text_layer_create(GRect(57, 42, 29, 22));
+	wday_bounds = GRect(0, 0, 30, 22);
+	wday_bounds.origin = time_bounds.origin;
+	helper_grect_center_x( &wday_bounds, &square_bounds );
+	wday_bounds.origin.y -= wday_bounds.size.h;
+	wday_layer = text_layer_create(wday_bounds);
 	text_layer_set_text_color(wday_layer, GColorWhite);
 	text_layer_set_background_color(wday_layer, GColorClear);
 	text_layer_set_font(wday_layer, wday_font);
 	text_layer_set_text_alignment(wday_layer, GTextAlignmentCenter);
+
+	//init bitmaps
+	image_no_connection = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_NO_CONNECTION);
+	no_connection_bounds = GRect(0, 0, 34, 12);
+	no_connection_bounds.origin = date_bounds.origin;
+	helper_grect_center_x( &no_connection_bounds, &square_bounds );
+	no_connection_bounds.origin.y += date_bounds.size.h + 3;
+	no_connection_layer = bitmap_layer_create(no_connection_bounds);
+	bitmap_layer_set_bitmap(no_connection_layer, image_no_connection);
+	bitmap_layer_set_alignment(no_connection_layer, GAlignCenter);
 	
 
 	//add textlayers to root window
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(wday_layer));
-	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(no_connection_layer));
+	layer_add_child(square_layer, text_layer_get_layer(time_layer));
+	layer_add_child(square_layer, text_layer_get_layer(date_layer));
+	layer_add_child(square_layer, text_layer_get_layer(wday_layer));
+	layer_add_child(square_layer, bitmap_layer_get_layer(no_connection_layer));
+	layer_add_child(window_layer, square_layer);
 
 	//initialize display
 	time_t temp = time(NULL);
@@ -134,6 +202,7 @@ static void deinit() {
 	gbitmap_destroy(image_no_connection);
 
 	//destroy layers
+	layer_destroy(square_layer);
 	text_layer_destroy(time_layer);
 	text_layer_destroy(date_layer);
 	text_layer_destroy(wday_layer);
