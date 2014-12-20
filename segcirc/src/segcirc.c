@@ -1,9 +1,6 @@
 #include "pebble.h"
 
 #define DATE_FORMAT "%d.%m.%Y"
-#define HOUR_RADIUS
-#define MINUTE_RADIUS
-#define SECOND_RADIUS
 
 //ui elements
 static Window* window;
@@ -33,6 +30,9 @@ static GRect time_bounds;
 static GRect date_bounds;
 static GRect wday_bounds;
 static GRect no_connection_bounds;
+
+//radius
+static uint16_t inner_radius, middle_radius, outer_radius;
 
 //weekday strings beginning with sunday ( see tm struct tm_wday )
 const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
@@ -65,12 +65,24 @@ static void helper_grect_center_y( GRect* rect, GRect* outer_rect ) {
 }
 
 //do all the drawing
+static void draw_hour_circles( GContext* context ) {
+	GPoint center = grect_center_point(&square_bounds);
+	center.x -= 1;
+	uint16_t hour;
+	GPoint point;
+	for( hour = 0; hour < 12; hour++ ) {
+		point = get_point_at_angle( center, outer_radius, 5*hour );
+		graphics_fill_circle( context, point, 2 );
+	}
+}
+
 static void draw(Layer* layer, GContext* context) {
 	GRect bounds = layer_get_bounds(layer);
 
 	graphics_context_set_stroke_color( context, GColorWhite);
 	graphics_context_set_fill_color( context, GColorWhite );
-	graphics_draw_rect( context, bounds );
+
+	draw_hour_circles(context);
 }
 
 //tick handlers
@@ -181,6 +193,11 @@ static void init() {
 	layer_add_child(square_layer, text_layer_get_layer(wday_layer));
 	layer_add_child(square_layer, bitmap_layer_get_layer(no_connection_layer));
 	layer_add_child(window_layer, square_layer);
+
+	//set radius
+	outer_radius = square_bounds.size.w / 2 - 2;
+	middle_radius = outer_radius - 5;
+	inner_radius = outer_radius - 5;
 
 	//initialize display
 	time_t temp = time(NULL);
