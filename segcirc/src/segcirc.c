@@ -80,8 +80,10 @@ static void draw_hour_circles( GContext* context ) {
 	uint16_t hour;
 	GPoint point;
 	for( hour = 0; hour < 12; hour++ ) {
-		point = get_point_at_angle( center_point, outer_radius, 5*hour );
-		graphics_fill_circle( context, point, 2 );
+		if( hour != state.current_time.tm_hour % 12 ) { //don't draw circle under hour hand
+			point = get_point_at_angle( center_point, outer_radius, 5*hour );
+			graphics_fill_circle( context, point, 2 );
+		}
 	}
 }
 
@@ -89,13 +91,17 @@ static void draw_minute_circles( GContext* context ) {
 	uint16_t minute;
 	GPoint point;
 	for( minute = 0; minute <= state.current_time.tm_min; minute++ ) {
-		point = get_point_at_angle( center_point, middle_radius, minute );
-		graphics_fill_circle( context, point, 2 );
+		if( minute != (state.current_time.tm_hour % 12)*5 ) { //don't draw circle under hour hand
+			point = get_point_at_angle( center_point, middle_radius, minute );
+			graphics_fill_circle( context, point, 2 );
+		}
 	}
 
 	for( minute = state.current_time.tm_min + 1; minute < 60; minute++ ) {
-		point = get_point_at_angle( center_point, middle_radius, minute );
-		graphics_draw_circle( context, point, 2 );
+		if( minute != (state.current_time.tm_hour % 12)*5 ) { //don't draw circle under hour hand
+			point = get_point_at_angle( center_point, middle_radius, minute );
+			graphics_draw_circle( context, point, 2 );
+		}
 	}
 }
 
