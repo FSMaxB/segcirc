@@ -10,6 +10,7 @@ static Layer* square_layer;
 static TextLayer* time_layer;	//to show the time
 static TextLayer* date_layer;	//to show the date
 static TextLayer* wday_layer;	//to show the current weekday
+static Layer* battery_layer;	//to show current battery charge
 static InverterLayer* inverter_layer;
 
 //fonts
@@ -31,6 +32,7 @@ static GRect square_bounds;
 static GRect time_bounds;
 static GRect date_bounds;
 static GRect wday_bounds;
+static GRect battery_bounds;
 static GRect no_connection_bounds;
 
 //radius
@@ -50,6 +52,7 @@ const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
 struct state {
 	bool connected;
 	struct tm current_time;
+	BatteryChargeState battery;
 };
 static struct state state;
 
@@ -121,6 +124,16 @@ static void draw(Layer* layer, GContext* context) {
 	draw_hour_hand(context);
 }
 
+static void draw_battery( Layer* layer, GContext* context ) {
+	graphics_context_set_stroke_color( context, GColorWhite );
+	graphics_context_set_fill_color( context, GColorWhite );
+
+	GRect bounds = layer_get_bounds(layer);
+	graphics_draw_rect( context,  bounds );
+	uint32_t width = bounds.size.w*state.battery.charge_percent / 100;
+	graphics_fill_rect( context, GRect(0, 0, width, bounds.size.h), 0, GCornerNone );
+}
+
 //tick handlers
 static void handle_second_tick(struct tm* tick_time) {
 	state.current_time = *tick_time;
@@ -162,9 +175,15 @@ static void handle_ticks( struct tm* tick_time, TimeUnits units_changed ) {
 	}
 }
 
+static void handle_battery_state( BatteryChargeState battery_state ) {
+	state.battery = battery_state;
+	layer_mark_dirty( battery_layer );
+}
+
 static void init() {
 	//initialise global state
 	state.connected = true;
+	state.battery = battery_state_service_peek();
 
 	//create main window
 	window = window_create();
@@ -196,7 +215,7 @@ static void init() {
 	text_layer_set_font(time_layer, time_font);
 	text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
 
-	date_bounds = GRect(0, 0, 80, 14);
+	date_bounds = GRect(0, 0, 85, 14);
 	date_bounds.origin = time_bounds.origin;
 	helper_grect_center_x( &date_bounds, &square_bounds );
 	date_bounds.origin.y += time_bounds.size.h;
@@ -206,15 +225,24 @@ static void init() {
 	text_layer_set_font(date_layer, date_font);
 	text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
 
+	//battery indicator
+	battery_bounds = GRect( 0, 0, 70, 4 );
+	helper_grect_center_x( &battery_bounds, &square_bounds );
+	battery_bounds.origin.y = time_bounds.origin.y + 2;
+	//battery_bounds.origin.y -= battery_bounds.size.h;
+	battery_layer = layer_create(battery_bounds);
+	layer_set_update_proc( battery_layer, draw_battery );
+
 	wday_bounds = GRect(0, 0, 30, 24);
-	wday_bounds.origin = time_bounds.origin;
+	wday_bounds.origin = battery_bounds.origin;
 	helper_grect_center_x( &wday_bounds, &square_bounds );
-	wday_bounds.origin.y -= wday_bounds.size.h;
+	wday_bounds.origin.y -= wday_bounds.size.h + 3;
 	wday_layer = text_layer_create(wday_bounds);
 	text_layer_set_text_color(wday_layer, GColorWhite);
 	text_layer_set_background_color(wday_layer, GColorClear);
 	text_layer_set_font(wday_layer, wday_font);
 	text_layer_set_text_alignment(wday_layer, GTextAlignmentCenter);
+
 
 	//init bitmaps
 	image_no_connection = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_NO_CONNECTION);
@@ -235,6 +263,7 @@ static void init() {
 	layer_add_child(square_layer, text_layer_get_layer(date_layer));
 	layer_add_child(square_layer, text_layer_get_layer(wday_layer));
 	layer_add_child(square_layer, bitmap_layer_get_layer(no_connection_layer));
+	layer_add_child(square_layer, battery_layer);
 	layer_add_child(window_layer, square_layer);
 	layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
 
@@ -263,9 +292,11 @@ static void init() {
 	handle_second_tick(localtime(&temp));
 	handle_minute_tick(localtime(&temp));
 	handle_hour_tick(localtime(&temp));
+	handle_battery_state(state.battery);
 
 	//register handlers
 	tick_timer_service_subscribe(SECOND_UNIT|MINUTE_UNIT|HOUR_UNIT, &handle_ticks);
+	battery_state_service_subscribe(handle_battery_state);
 }
 
 static void deinit() {
@@ -283,9 +314,14 @@ static void deinit() {
 	text_layer_destroy(time_layer);
 	text_layer_destroy(date_layer);
 	text_layer_destroy(wday_layer);
+	layer_destroy(battery_layer);
 	bitmap_layer_destroy(no_connection_layer);
 
 	gpath_destroy( hour_hand );
+
+	//unsubscribe handlers
+	battery_state_service_unsubscribe();
+	tick_timer_service_unsubscribe();
 
 	//destroy main window
 	window_destroy(window);
