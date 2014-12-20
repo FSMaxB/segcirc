@@ -35,7 +35,11 @@ static GRect no_connection_bounds;
 static uint16_t inner_radius, middle_radius, outer_radius;
 
 //center point
-GPoint center_point;
+static GPoint center_point;
+
+//hour hand
+static GPathInfo hour_hand_points;
+static GPath* hour_hand;
 
 //weekday strings beginning with sunday ( see tm struct tm_wday )
 const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
@@ -95,12 +99,18 @@ static void draw_minute_circles( GContext* context ) {
 	}
 }
 
+static void draw_hour_hand( GContext* context ) {
+	gpath_rotate_to( hour_hand, TRIG_MAX_ANGLE*(state.current_time.tm_hour%12)/12);
+	gpath_draw_filled( context, hour_hand );
+}
+
 static void draw(Layer* layer, GContext* context) {
 	graphics_context_set_stroke_color( context, GColorWhite);
 	graphics_context_set_fill_color( context, GColorWhite );
 
 	draw_hour_circles(context);
 	draw_minute_circles(context);
+	draw_hour_hand(context);
 }
 
 //tick handlers
@@ -224,6 +234,21 @@ static void init() {
 	center_point = grect_center_point( &square_bounds );
 	center_point.x -= 1;
 
+	//set hour hand points
+	GPoint point_a = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, -TRIG_MAX_ANGLE / 120);
+	GPoint point_b = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, TRIG_MAX_ANGLE / 120);
+	GPoint point_c = get_point_at_exact_angle(GPoint(0,0), middle_radius - 3, TRIG_MAX_ANGLE / 120);
+	GPoint point_d = get_point_at_exact_angle(GPoint(0,0), middle_radius - 3, -TRIG_MAX_ANGLE / 120);
+	hour_hand_points.num_points = 4;
+	hour_hand_points.points = ( GPoint [] ) {
+		{ point_a.x, point_a.y },
+		{ point_b.x, point_b.y },
+		{ point_c.x, point_c.y },
+		{ point_d.x, point_d.y }
+	};
+	hour_hand = gpath_create(&hour_hand_points);
+	gpath_move_to( hour_hand, center_point );
+
 	//initialize display
 	time_t temp = time(NULL);
 	handle_second_tick(localtime(&temp));
@@ -249,6 +274,8 @@ static void deinit() {
 	text_layer_destroy(date_layer);
 	text_layer_destroy(wday_layer);
 	bitmap_layer_destroy(no_connection_layer);
+
+	gpath_destroy( hour_hand );
 
 	//destroy main window
 	window_destroy(window);
