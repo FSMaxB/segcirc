@@ -34,12 +34,16 @@ static GRect no_connection_bounds;
 //radius
 static uint16_t inner_radius, middle_radius, outer_radius;
 
+//center point
+GPoint center_point;
+
 //weekday strings beginning with sunday ( see tm struct tm_wday )
 const char* weekday_strings[7] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
 
 //global state
 struct state {
 	bool connected;
+	struct tm current_time;
 };
 static struct state state;
 
@@ -47,8 +51,8 @@ static struct state state;
 //get the coordinates of a point on a circle with a certain radius and at a certain angle
 GPoint get_point_at_angle(GPoint middle, uint32_t radius, int16_t angle /*0-59*/) {
 	uint32_t full_angle = TRIG_MAX_ANGLE * angle / 60;
-	middle.x += (-cos_lookup(full_angle)*radius / TRIG_MAX_RATIO);
-	middle.y += (sin_lookup(full_angle)*radius / TRIG_MAX_RATIO);
+	middle.x += (sin_lookup(full_angle)*radius / TRIG_MAX_RATIO);
+	middle.y += (-cos_lookup(full_angle)*radius / TRIG_MAX_RATIO);
 	return middle;
 }
 
@@ -66,13 +70,25 @@ static void helper_grect_center_y( GRect* rect, GRect* outer_rect ) {
 
 //do all the drawing
 static void draw_hour_circles( GContext* context ) {
-	GPoint center = grect_center_point(&square_bounds);
-	center.x -= 1;
 	uint16_t hour;
 	GPoint point;
 	for( hour = 0; hour < 12; hour++ ) {
-		point = get_point_at_angle( center, outer_radius, 5*hour );
+		point = get_point_at_angle( center_point, outer_radius, 5*hour );
 		graphics_fill_circle( context, point, 2 );
+	}
+}
+
+static void draw_minute_circles( GContext* context ) {
+	uint16_t minute;
+	GPoint point;
+	for( minute = 0; minute <= state.current_time.tm_min; minute++ ) {
+		point = get_point_at_angle( center_point, middle_radius, minute );
+		graphics_fill_circle( context, point, 2 );
+	}
+
+	for( minute = state.current_time.tm_min + 1; minute < 60; minute++ ) {
+		point = get_point_at_angle( center_point, middle_radius, minute );
+		graphics_draw_circle( context, point, 2 );
 	}
 }
 
@@ -83,10 +99,12 @@ static void draw(Layer* layer, GContext* context) {
 	graphics_context_set_fill_color( context, GColorWhite );
 
 	draw_hour_circles(context);
+	draw_minute_circles(context);
 }
 
 //tick handlers
 static void handle_second_tick(struct tm* tick_time) {
+	state.current_time = *tick_time;
 }
 
 static void handle_minute_tick(struct tm* tick_time) {
@@ -98,6 +116,7 @@ static void handle_minute_tick(struct tm* tick_time) {
 	}
 
 	text_layer_set_text(time_layer, time_text);
+	layer_mark_dirty(square_layer);
 }
 
 static void handle_hour_tick(struct tm* tick_time) {
@@ -107,6 +126,7 @@ static void handle_hour_tick(struct tm* tick_time) {
 
 	//set current weekday string
 	text_layer_set_text(wday_layer, weekday_strings[tick_time->tm_wday]);
+	layer_mark_dirty( square_layer );
 }
 
 static void handle_ticks( struct tm* tick_time, TimeUnits units_changed ) {
@@ -196,8 +216,12 @@ static void init() {
 
 	//set radius
 	outer_radius = square_bounds.size.w / 2 - 2;
-	middle_radius = outer_radius - 5;
+	middle_radius = outer_radius - 7;
 	inner_radius = outer_radius - 5;
+
+	//set center point
+	center_point = grect_center_point( &square_bounds );
+	center_point.x -= 1;
 
 	//initialize display
 	time_t temp = time(NULL);
