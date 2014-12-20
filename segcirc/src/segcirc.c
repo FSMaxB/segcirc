@@ -1,14 +1,16 @@
 #include "pebble.h"
 
 #define DATE_FORMAT "%d.%m.%Y"
+#define DARK_STYLE true
 
 //ui elements
 static Window* window;
 static Layer* window_layer;
 static Layer* square_layer;
-static TextLayer *time_layer;	//to show the time
-static TextLayer *date_layer;	//to show the date
-static TextLayer *wday_layer;	//to show the current weekday
+static TextLayer* time_layer;	//to show the time
+static TextLayer* date_layer;	//to show the date
+static TextLayer* wday_layer;	//to show the current weekday
+static InverterLayer* inverter_layer;
 
 //fonts
 static GFont time_font;
@@ -223,7 +225,10 @@ static void init() {
 	no_connection_layer = bitmap_layer_create(no_connection_bounds);
 	bitmap_layer_set_bitmap(no_connection_layer, image_no_connection);
 	bitmap_layer_set_alignment(no_connection_layer, GAlignCenter);
-	
+
+	//inverter layer
+	inverter_layer = inverter_layer_create( window_bounds );
+	layer_set_hidden( inverter_layer_get_layer(inverter_layer), DARK_STYLE );
 
 	//add textlayers to root window
 	layer_add_child(square_layer, text_layer_get_layer(time_layer));
@@ -231,6 +236,7 @@ static void init() {
 	layer_add_child(square_layer, text_layer_get_layer(wday_layer));
 	layer_add_child(square_layer, bitmap_layer_get_layer(no_connection_layer));
 	layer_add_child(window_layer, square_layer);
+	layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
 
 	//set radius
 	outer_radius = square_bounds.size.w / 2 - 2;
@@ -242,16 +248,12 @@ static void init() {
 	center_point.x -= 1;
 
 	//set hour hand points
-	GPoint point_a = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, -TRIG_MAX_ANGLE / 120);
-	GPoint point_b = get_point_at_exact_angle(GPoint(0,0), outer_radius + 2, TRIG_MAX_ANGLE / 120);
-	GPoint point_c = get_point_at_exact_angle(GPoint(0,0), middle_radius - 4, TRIG_MAX_ANGLE / 120);
-	GPoint point_d = get_point_at_exact_angle(GPoint(0,0), middle_radius - 4, -TRIG_MAX_ANGLE / 120);
 	hour_hand_points.num_points = 4;
 	hour_hand_points.points = ( GPoint [] ) {
-		{ point_a.x, point_a.y },
-		{ point_b.x, point_b.y },
-		{ point_c.x, point_c.y },
-		{ point_d.x, point_d.y }
+		{ -2, -(outer_radius + 2) },
+		{  2, -(outer_radius + 2) },
+		{  2, -(middle_radius - 5) },
+		{ -2, -(middle_radius - 5) }
 	};
 	hour_hand = gpath_create(&hour_hand_points);
 	gpath_move_to( hour_hand, center_point );
@@ -276,6 +278,7 @@ static void deinit() {
 	gbitmap_destroy(image_no_connection);
 
 	//destroy layers
+	inverter_layer_destroy(inverter_layer);
 	layer_destroy(square_layer);
 	text_layer_destroy(time_layer);
 	text_layer_destroy(date_layer);
