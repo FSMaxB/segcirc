@@ -180,6 +180,11 @@ static void handle_battery_state( BatteryChargeState battery_state ) {
 	layer_mark_dirty( battery_layer );
 }
 
+static void handle_bluetooth( bool connected ) {
+	state.connected = connected;
+	layer_set_hidden( bitmap_layer_get_layer(no_connection_layer), connected );
+}
+
 static void init() {
 	//initialise global state
 	state.connected = true;
@@ -253,6 +258,8 @@ static void init() {
 	no_connection_layer = bitmap_layer_create(no_connection_bounds);
 	bitmap_layer_set_bitmap(no_connection_layer, image_no_connection);
 	bitmap_layer_set_alignment(no_connection_layer, GAlignCenter);
+	state.connected = bluetooth_connection_service_peek();	//get current connection status
+	layer_set_hidden( bitmap_layer_get_layer(no_connection_layer), state.connected );
 
 	//inverter layer
 	inverter_layer = inverter_layer_create( window_bounds );
@@ -297,6 +304,7 @@ static void init() {
 	//register handlers
 	tick_timer_service_subscribe(SECOND_UNIT|MINUTE_UNIT|HOUR_UNIT, &handle_ticks);
 	battery_state_service_subscribe(handle_battery_state);
+	bluetooth_connection_service_subscribe( handle_bluetooth );
 }
 
 static void deinit() {
@@ -322,6 +330,7 @@ static void deinit() {
 	//unsubscribe handlers
 	battery_state_service_unsubscribe();
 	tick_timer_service_unsubscribe();
+	bluetooth_connection_service_unsubscribe();
 
 	//destroy main window
 	window_destroy(window);
