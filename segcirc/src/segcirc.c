@@ -204,7 +204,7 @@ static void init() {
 	date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_FOURTEEN_SEGMENT_14));
 
 	//init layer
-	square_bounds = GRect(0, 0, window_bounds.size.w, window_bounds.size.w );
+	square_bounds = GRect(0, 0, window_bounds.size.w, window_bounds.size.w + 1 );
 	grect_align( &square_bounds, &window_bounds, GAlignCenter, true );
 	square_layer = layer_create(square_bounds);
 	layer_set_update_proc(square_layer, draw);
