@@ -42,6 +42,7 @@ static uint16_t inner_radius, middle_radius, outer_radius;
 static GPoint center_point;
 
 //hour hand
+static GPathInfo initial_hour_hand_points;
 static GPathInfo hour_hand_points;
 static GPath* hour_hand;
 
@@ -80,6 +81,15 @@ static void helper_grect_center_y( GRect* rect, GRect* outer_rect ) {
 	rect->origin.x = x;
 }
 
+//rotate Points around the origin (0,0)
+static GPoint helper_rotate_point( GPoint point, int32_t angle ) {
+		//(cos(α) x(A) - sin(α) y(A), sin(α) x(A) + cos(α) y(A)) //Entspricht Multiplikation mit Drehmatrix
+		GPoint new_point;
+		new_point.x = (cos_lookup(angle)*point.x - sin_lookup(angle)*point.y)/TRIG_MAX_RATIO;
+		new_point.y = (sin_lookup(angle)*point.x + cos_lookup(angle)*point.y)/TRIG_MAX_RATIO;
+		return new_point;
+}
+
 //do all the drawing
 static void draw_hour_circles( GContext* context ) {
 	uint16_t hour;
@@ -111,7 +121,6 @@ static void draw_minute_circles( GContext* context ) {
 }
 
 static void draw_hour_hand( GContext* context ) {
-	gpath_rotate_to( hour_hand, TRIG_MAX_ANGLE*(state.current_time.tm_hour%12)/12);
 	gpath_draw_filled( context, hour_hand );
 }
 
@@ -159,6 +168,13 @@ static void handle_hour_tick(struct tm* tick_time) {
 	//set current weekday string
 	text_layer_set_text(wday_layer, weekday_strings[tick_time->tm_wday]);
 	layer_mark_dirty( square_layer );
+
+	int32_t hour_angle = (TRIG_MAX_ANGLE*(state.current_time.tm_hour%12))/12;
+	uint16_t i;
+	for( i = 0; i < hour_hand->num_points; i++ ) {
+		hour_hand->points[i] =
+			helper_rotate_point( initial_hour_hand_points.points[i], hour_angle );
+	}
 }
 
 static void handle_ticks( struct tm* tick_time, TimeUnits units_changed ) {
@@ -284,12 +300,20 @@ static void init() {
 	center_point.x -= 1;
 
 	//set hour hand points
-	hour_hand_points.num_points = 4;
-	hour_hand_points.points = ( GPoint [] ) {
-		{ -2, -(outer_radius + 2) },
-		{  2, -(outer_radius + 2) },
-		{  2, -(middle_radius - 5) },
-		{ -2, -(middle_radius - 5) }
+	initial_hour_hand_points.num_points = 4;
+	initial_hour_hand_points.points = ( GPoint [] ) {
+		{ -3, -(outer_radius + 1) },
+		{  3, -(outer_radius + 1) },
+		{  3, -(middle_radius - 3) },
+		{ -3, -(middle_radius - 3) }
+	};
+	//copy initial_hour_hand_points to hour_hand_points
+	hour_hand_points.num_points = initial_hour_hand_points.num_points;
+	hour_hand_points.points = ( GPoint[] ) {
+		{ initial_hour_hand_points.points[0].x, initial_hour_hand_points.points[0].y },
+		{ initial_hour_hand_points.points[1].x, initial_hour_hand_points.points[1].y },
+		{ initial_hour_hand_points.points[2].x, initial_hour_hand_points.points[2].y },
+		{ initial_hour_hand_points.points[3].x, initial_hour_hand_points.points[3].y }
 	};
 	hour_hand = gpath_create(&hour_hand_points);
 	gpath_move_to( hour_hand, center_point );
@@ -302,7 +326,7 @@ static void init() {
 	handle_battery_state(state.battery);
 
 	//register handlers
-	tick_timer_service_subscribe(SECOND_UNIT|MINUTE_UNIT|HOUR_UNIT, &handle_ticks);
+	tick_timer_service_subscribe(/*SECOND_UNIT|*/MINUTE_UNIT|HOUR_UNIT, &handle_ticks);
 	battery_state_service_subscribe(handle_battery_state);
 	bluetooth_connection_service_subscribe( handle_bluetooth );
 }
