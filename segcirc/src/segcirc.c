@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-#include "pebble.h"
+#include <pebble.h>
 
 #define DATE_FORMAT "%d.%m.%Y"
 #define DARK_STYLE true
