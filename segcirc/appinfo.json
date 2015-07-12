@@ -11,26 +11,31 @@
   "appKeys": {},
   "resources": {
     "media": [
-		{
-			"type": "font",
-			"name": "FONT_FOURTEEN_SEGMENT_38",
-			"file": "FourteenSegment.ttf"
-		},
-		{
-			"type": "font",
-			"name": "FONT_FOURTEEN_SEGMENT_24",
-			"file": "FourteenSegment.ttf"
-		},
-		{
-			"type": "font",
-			"name": "FONT_FOURTEEN_SEGMENT_14",
-			"file": "FourteenSegment.ttf"
-		},
-		{
-			"type": "png",
-			"name": "IMAGE_NO_CONNECTION",
-			"file": "NoConnection.png"
-		}
-	]
-  }
+      {
+        "type": "font",
+        "name": "FONT_FOURTEEN_SEGMENT_38",
+        "file": "FourteenSegment.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_FOURTEEN_SEGMENT_24",
+        "file": "FourteenSegment.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_FOURTEEN_SEGMENT_14",
+        "file": "FourteenSegment.ttf"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_NO_CONNECTION",
+        "file": "NoConnection.png"
+      }
+    ]
+  },
+  "targetPlatforms": [
+    "aplite",
+    "basalt"
+  ],
+  "sdkVersion": "3"
 }

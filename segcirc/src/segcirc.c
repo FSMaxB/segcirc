@@ -19,7 +19,6 @@
 #include <pebble.h>
 
 #define DATE_FORMAT "%d.%m.%Y"
-#define DARK_STYLE true
 
 //ui elements
 static Window* window;
@@ -29,7 +28,6 @@ static TextLayer* time_layer;	//to show the time
 static TextLayer* date_layer;	//to show the date
 static TextLayer* wday_layer;	//to show the current weekday
 static Layer* battery_layer;	//to show current battery charge
-static InverterLayer* inverter_layer;
 
 //fonts
 static GFont time_font;
@@ -295,10 +293,6 @@ static void init() {
 	state.connected = bluetooth_connection_service_peek();	//get current connection status
 	layer_set_hidden( bitmap_layer_get_layer(no_connection_layer), state.connected );
 
-	//inverter layer
-	inverter_layer = inverter_layer_create( window_bounds );
-	layer_set_hidden( inverter_layer_get_layer(inverter_layer), DARK_STYLE );
-
 	//add textlayers to root window
 	layer_add_child(square_layer, text_layer_get_layer(time_layer));
 	layer_add_child(square_layer, text_layer_get_layer(date_layer));
@@ -306,7 +300,6 @@ static void init() {
 	layer_add_child(square_layer, bitmap_layer_get_layer(no_connection_layer));
 	layer_add_child(square_layer, battery_layer);
 	layer_add_child(window_layer, square_layer);
-	layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
 
 	//set radius
 	outer_radius = square_bounds.size.w / 2 - 2;
@@ -359,7 +352,6 @@ static void deinit() {
 	gbitmap_destroy(image_no_connection);
 
 	//destroy layers
-	inverter_layer_destroy(inverter_layer);
 	layer_destroy(square_layer);
 	text_layer_destroy(time_layer);
 	text_layer_destroy(date_layer);
