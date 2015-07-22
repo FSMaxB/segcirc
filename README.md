@@ -6,7 +6,7 @@ Segcirc watchface
 This is a watchface for the pebble smartwatch inspired by the studioclock watchface.
 
 The Watchface is located in the `segcirc` subdirectory. To compile and install it you need the Pebble SDK,
-follow the instructions by pebble.
+follow the instructions by pebble. (SDK version 2.9 is required since segcirc uses the inverter layer which has been removed in SDK version 3).
 
 The subdirectory `love2d-prototype` contains a prototype written in Lua with the LÖVE (Love 2D) game framework. To run it you need the LÖVE gameframework ( http://love2d.org ), then run it with `love main.lua`.
 
