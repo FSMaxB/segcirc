@@ -14,7 +14,7 @@ Date and weekday are in german notation.
 
 Known Bugs
 ----------
-* The numbers 3 and 7 aren't displayed properly in the date. They're missing a vertical line of pixels. I haven't been able to fix this problem, it is probably related with the font I use, which I made myself due to the lack of free alternatives ( https://github.com/FSMaxB/FourteenSegments ).
+* The numbers 3 and 7 aren't displayed properly in the date. They're missing a vertical line of pixels. I haven't been able to fix this problem, it is probably related to the font I use, which I made myself due to the lack of free alternatives ( https://github.com/FSMaxB/FourteenSegments ).
 
 License
 -------
